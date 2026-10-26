@@ -1,74 +1,376 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gọi món</title>
-    <link rel="stylesheet" href="./index.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trợ lý giọng nói AI</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #19243a;
+      background: #f3f6fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 32px 16px;
+      background: radial-gradient(circle at 15% 0%, #e1efff 0, transparent 34%), #f3f6fb;
+    }
+
+    main {
+      width: min(100%, 760px);
+      margin: 0 auto;
+    }
+
+    header { margin: 8px 0 22px; }
+    h1 { margin: 0 0 8px; font-size: clamp(26px, 5vw, 36px); }
+    header p { margin: 0; color: #58657b; line-height: 1.5; }
+
+    .card {
+      margin: 14px 0;
+      padding: 20px;
+      border: 1px solid #e2e8f1;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 8px 28px #243b5710;
+    }
+
+    label { display: block; margin-bottom: 8px; font-weight: 650; }
+    input, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ccd6e4;
+      border-radius: 10px;
+      color: inherit;
+      background: #fff;
+      font: inherit;
+    }
+
+    input:focus, textarea:focus {
+      outline: 3px solid #3b82f633;
+      border-color: #3b82f6;
+    }
+
+    .hint, .status { color: #647187; font-size: 14px; line-height: 1.5; }
+    .hint { margin: 9px 0 0; }
+    .status { min-height: 22px; margin: 12px 0 0; }
+    .status.error { color: #b42318; }
+    .status.success { color: #167447; }
+
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .row + .row { margin-top: 12px; }
+    button {
+      min-height: 44px;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 10px;
+      background: #eaf0f8;
+      color: #20314c;
+      font: inherit;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    button:hover:not(:disabled) { filter: brightness(.97); }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    button.primary { background: #2563eb; color: #fff; }
+    button.record { background: #dc3545; color: #fff; }
+    button.subtle { background: transparent; color: #52627a; }
+    textarea { min-height: 88px; resize: vertical; }
+
+    #conversation {
+      display: grid;
+      gap: 12px;
+      max-height: 420px;
+      overflow: auto;
+    }
+    .message { padding: 13px 15px; border-radius: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+    .message.user { margin-left: 9%; background: #edf4ff; }
+    .message.assistant { margin-right: 9%; background: #f2f4f7; }
+    .message strong { display: block; margin-bottom: 4px; font-size: 13px; color: #53627a; }
+    audio { width: 100%; margin-top: 12px; }
+    .privacy { font-size: 13px; color: #647187; }
+
+    @media (max-width: 520px) {
+      body { padding: 18px 12px; }
+      .card { padding: 16px; }
+      .row button { flex: 1; }
+    }
+    </style>
 </head>
 <body>
-    <header class="page-header">
-        <div>
-            <p class="eyebrow">Ẩm thực Việt </p>
-            <h1>Gọi món</h1>
-        </div>
-        <button id="voice-button" class="voice-button" type="button" autofocus aria-describedby="voice-status">Bật gọi món bằng giọng nói</button>
+  <main>
+    <header>
+      <h1>Trợ lý giọng nói AI</h1>
+      <p>Nói hoặc nhập câu hỏi; trợ lý sẽ trả lời bằng văn bản và giọng nói.</p>
     </header>
-    <p id="voice-status" class="voice-status" role="status" aria-live="polite">Nhấn Enter, Space hoặc chạm hai ngón tay hai lần để gọi món.</p>
-    <div class="noise-meter" aria-label="Mức âm thanh môi trường">
-        <span id="noise-level-fill"></span>
-    </div>
-    <main class="order-layout">
-        <section class="menu-panel">
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow">THỰC ĐƠN</p>
-                    <h2>Món ăn</h2>
-                </div>
-                <span class="menu-count">8 món</span>
-            </div>
-            <div class="container menu">
-        <div id="pho_bo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlp-qO6K4A7V0oR6h5LQB8CWO6m1zcCIcTqZRRdr5Qgg&s" alt="Phở bò"><br>Phở bò<br><button id="pho_bo-btn" aria-label="Thêm một phở bò">+</button> 50.000 <button id="pho_bo-btn2" aria-label="Bớt một phở bò">-</button></div>
-        <div id="banh_mi"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7_l6dpnxc2BqpTRdn1ya8xgz_zq0I9zi9OlVBU1wnUg&s=10" alt="Bánh mì"><br>Bánh mì<br><button id="banh_mi-btn" aria-label="Thêm một bánh mì">+</button> 45.000 <button id="banh_mi-btn2" aria-label="Bớt một bánh mì">-</button></div>
-        <div id="bun_cha"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKWZqNBa1959CjqXNy-9Hl6VpTvhbld88ebbR6nVXFxQ&s=10" alt="Bún chả"><br>Bún chả<br><button id="bun_cha-btn" aria-label="Thêm một bún chả">+</button> 60.000 <button id="bun_cha-btn2" aria-label="Bớt một bún chả">-</button></div>
-        <div id="com_tam"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsxjQ47Osjztnx4022-Pynjz4gEOTGEXUGUXnfGrT6Rw&s=10" alt="Cơm tấm"><br>Cơm tấm<br><button id="com_tam-btn" aria-label="Thêm một cơm tấm">+</button> 60.000 <button id="com_tam-btn2" aria-label="Bớt một cơm tấm">-</button></div>
-        <div id="bun_bo">
-            <img src="  https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR26Fn2RAt6OIHQmYNj3HOH69Lipd8LuX3Uvz5JnyKrrw&s=10"
-            alt="Cơm tấm" width="175px" height="125px"><br>
-            Bún bò<br><button id = "bun_bo-btn" aria-label="Thêm một bún bò"> + </button>50.000
-            <button id = "bun_bo-btn2" aria-label="Bớt một bún bò"> - </button>
-        </div>
-        <div id="com_ga">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThIHpPTa-2oDrnLSK5XokOSkpfOaJzmwjRFQ8Ol5sWSQ&s=10"
-            alt=" Cơm gà" width="175px" height="125px"><br>
-            Cơm gà<br><button id = "com_ga-btn" aria-label="Thêm một cơm gà"> + </button>60.000    
-            <button id = "com_ga-btn2" aria-label="Bớt một cơm gà"> - </button>
-        </div>
-        <div id="tra_tac">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdvq2VJyFIZ4A0S9NBxgoj72olMcEBSTm4m46RqNW2jQ&s=10"
-            alt="Trà tắc" width="175px" height="125px"><br>
-            Trà tắc<br> <button id = "tra_tac-btn" aria-label="Thêm một trà tắc"> + </button> 20.000
-            <button id = "tra_tac-btn2" aria-label="Bớt một trà tắc"> - </button>
-        </div>
-        <div id="tra_da">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSydkB8eUi95gdqH1KgJmneJASi0XXi7ou3t0dR2Euc3Q&s=10"
-            alt="Trà đá"><br>
-            Trà đá<br> <button id="tra_da-btn" aria-label="Thêm một trà đá">+</button> 12.000
-            <button id="tra_da-btn2" aria-label="Bớt một trà đá">-</button>
-        </div>
-            </div> 
-        </section>
-        <aside class="cart-panel">
-            <div class="section-heading">
-                <div><p class="eyebrow">ĐƠN CỦA BẠN</p><h2>Giỏ hàng</h2></div>
-                <span class="cart-icon" aria-hidden="true">🛒</span>
-            </div>
-            <table id="gio"><tr><th>Món ăn</th><th>Giá</th></tr></table>
-            <div class="cart-total"><span>Tổng tiền</span><strong id="cart-total">0đ</strong></div>
-            <button class="submit-order-button" id="submit-order-button" type="button">Đặt món</button>
-        </aside>
-    </main>
-<script type="text/javascript" src="./index.AI"></script>
-<script src="./index.js"></script>
+
+    <section class="card" aria-label="Cài đặt API">
+      <label for="apiKey">OpenAI API key</label>
+      <input id="apiKey" type="password" autocomplete="off" placeholder="sk-..." aria-describedby="keyHint">
+      <p class="hint" id="keyHint">Key chỉ được giữ trong trang đang mở, không lưu vào file hay bộ nhớ trình duyệt. Không chia sẻ trang này khi đang nhập key.</p>
+    </section>
+
+    <section class="card" aria-label="Điều khiển giọng nói">
+      <div class="row">
+        <button id="recordButton" class="record" type="button">● Bắt đầu nói</button>
+        <button id="stopButton" type="button" disabled>Dừng và gửi</button>
+        <button id="clearButton" class="subtle" type="button">Xóa hội thoại</button>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite">Nhập API key rồi bắt đầu nói hoặc nhập tin nhắn.</p>
+      <div id="conversation" aria-live="polite"></div>
+      <audio id="audioPlayer" controls hidden></audio>
+    </section>
+
+    <section class="card" aria-label="Nhập văn bản">
+      <label for="textInput">Hoặc nhập tin nhắn</label>
+      <textarea id="textInput" placeholder="Bạn muốn hỏi điều gì?"></textarea>
+      <div class="row">
+        <button id="sendButton" class="primary" type="button">Gửi tin nhắn</button>
+      </div>
+    </section>
+
+    <p class="privacy">Yêu cầu được gửi trực tiếp từ trình duyệt đến OpenAI bằng API key của m. Dùng key cá nhân, không công khai</p>
+  </main>
+
+  <script>
+    const apiKeyInput = document.getElementById("apiKey");
+    const recordButton = document.getElementById("recordButton");
+    const stopButton = document.getElementById("stopButton");
+    const sendButton = document.getElementById("sendButton");
+    const clearButton = document.getElementById("clearButton");
+    const textInput = document.getElementById("textInput");
+    const conversationElement = document.getElementById("conversation");
+    const statusElement = document.getElementById("status");
+    const audioPlayer = document.getElementById("audioPlayer");
+
+    let recorder;
+    let microphoneStream;
+    let audioChunks = [];
+    let busy = false;
+    let conversation = [];
+    let audioObjectUrl;
+
+    function setStatus(message, kind = "") {
+      statusElement.textContent = message;
+      statusElement.className = `status ${kind}`;
+    }
+
+    function setBusy(value) {
+      busy = value;
+      sendButton.disabled = value;
+      recordButton.disabled = value || Boolean(recorder);
+      textInput.disabled = value;
+    }
+
+    function addMessage(role, text) {
+      const article = document.createElement("article");
+      article.className = `message ${role}`;
+      const label = document.createElement("strong");
+      label.textContent = role === "user" ? "Bạn" : "Trợ lý";
+      const content = document.createElement("div");
+      content.textContent = text;
+      article.append(label, content);
+      conversationElement.append(article);
+      conversationElement.scrollTop = conversationElement.scrollHeight;
+    }
+
+    async function readError(response) {
+      let message = `Yêu cầu thất bại (HTTP ${response.status}).`;
+      try {
+        const data = await response.json();
+        if (data.error && data.error.message) message = data.error.message;
+      } catch {
+        message = `Yêu cầu thất bại (HTTP ${response.status}).`;
+      }
+      return message;
+    }
+
+    function getKey() {
+      const key = apiKeyInput.value.trim();
+      if (!key) throw new Error("nhập key open ai.");
+      return key;
+    }
+
+    async function transcribeAudio(blob) {
+      const form = new FormData();
+      const extension = blob.type.includes("mp4") ? "mp4" : "webm";
+      form.append("file", blob, `ghi-am.${extension}`);
+      form.append("model", "gpt-4o-mini-transcribe");
+
+      const response = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${getKey()}` },
+        body: form
+      });
+      if (!response.ok) throw new Error(await readError(response));
+      const data = await response.json();
+      if (!data.text || !data.text.trim()) throw new Error("Không nhận diện được lời nói. Bạn thử ghi âm lại nhé.");
+      return data.text.trim();
+    }
+
+    async function askAssistant(text) {
+      const nextConversation = [...conversation, { role: "user", content: text }];
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getKey()}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "Bạn là trợ lý thân thiện, trả lời bằng tiếng Việt rõ ràng và ngắn gọn." },
+            ...nextConversation
+          ]
+        })
+      });
+      if (!response.ok) throw new Error(await readError(response));
+      const data = await response.json();
+      const answer = data.choices && data.choices[0] && data.choices[0].message
+        ? data.choices[0].message.content
+        : "";
+      if (!answer) throw new Error("OpenAI không trả về nội dung. Vui lòng thử lại.");
+      conversation = [...nextConversation, { role: "assistant", content: answer }];
+      return answer;
+    }
+
+    async function speak(text) {
+      const response = await fetch("https://api.openai.com/v1/audio/speech", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getKey()}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "tts-1",
+          voice: "alloy",
+          input: text,
+          response_format: "mp3"
+        })
+      });
+      if (!response.ok) throw new Error(await readError(response));
+      const audioBlob = await response.blob();
+      if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
+      audioObjectUrl = URL.createObjectURL(audioBlob);
+      audioPlayer.src = audioObjectUrl;
+      audioPlayer.hidden = false;
+      await audioPlayer.play();
+    }
+
+    async function processText(text) {
+      const trimmed = text.trim();
+      if (!trimmed || busy) return;
+      try {
+        getKey();
+        setBusy(true);
+        addMessage("user", trimmed);
+        setStatus("Đang tạo câu trả lời...");
+        const answer = await askAssistant(trimmed);
+        addMessage("assistant", answer);
+        setStatus("Đang tạo giọng nói...");
+        try {
+          await speak(answer);
+          setStatus("Đã trả lời xong.", "success");
+        } catch (error) {
+          setStatus(`Đã có câu trả lời nhưng phát giọng nói không thành công: ${error.message}`, "error");
+        }
+      } catch (error) {
+        setStatus(error.message, "error");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    recordButton.addEventListener("click", async () => {
+      try {
+        getKey();
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error("Trình duyệt không hỗ trợ micro. Hãy mở bằng Chrome hoặc Edge.");
+        }
+        microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mimeType = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"]
+          .find(type => MediaRecorder.isTypeSupported(type));
+        recorder = mimeType ? new MediaRecorder(microphoneStream, { mimeType }) : new MediaRecorder(microphoneStream);
+        audioChunks = [];
+        recorder.addEventListener("dataavailable", event => {
+          if (event.data.size) audioChunks.push(event.data);
+        });
+        recorder.addEventListener("stop", async () => {
+          const blob = new Blob(audioChunks, { type: recorder.mimeType || "audio/webm" });
+          microphoneStream.getTracks().forEach(track => track.stop());
+          microphoneStream = null;
+          recorder = null;
+          stopButton.disabled = true;
+          recordButton.disabled = true;
+          if (!blob.size) {
+            setStatus("Không ghi được âm thanh. Hãy thử lại.", "error");
+            recordButton.disabled = false;
+            return;
+          }
+          try {
+            setBusy(true);
+            setStatus("Đang nhận diện giọng nói...");
+            const transcript = await transcribeAudio(blob);
+            textInput.value = transcript;
+            await processText(transcript);
+          } catch (error) {
+            setStatus(error.message, "error");
+          } finally {
+            setBusy(false);
+            recordButton.disabled = false;
+          }
+        }, { once: true });
+        recorder.start();
+        recordButton.disabled = true;
+        stopButton.disabled = false;
+        setStatus("Đang nghe... Bấm “Dừng và gửi” khi bạn nói xong.");
+      } catch (error) {
+        if (microphoneStream) microphoneStream.getTracks().forEach(track => track.stop());
+        microphoneStream = null;
+        recorder = null;
+        stopButton.disabled = true;
+        recordButton.disabled = false;
+        setStatus(error.message, "error");
+      }
+    });
+
+    stopButton.addEventListener("click", () => {
+      if (recorder && recorder.state !== "inactive") {
+        stopButton.disabled = true;
+        recorder.stop();
+      }
+    });
+
+    sendButton.addEventListener("click", async () => {
+      const text = textInput.value;
+      textInput.value = "";
+      await processText(text);
+    });
+
+    textInput.addEventListener("keydown", event => {
+      if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        sendButton.click();
+      }
+    });
+
+    clearButton.addEventListener("click", () => {
+      conversation = [];
+      conversationElement.replaceChildren();
+      textInput.value = "";
+      audioPlayer.pause();
+      audioPlayer.removeAttribute("src");
+      audioPlayer.hidden = true;
+      if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
+      audioObjectUrl = null;
+      setStatus("Đã xóa hội thoại.");
+    });
+  </script>
 </body>
 </html>
+
+    
