@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gọi món</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Ẩm thực Việt </p>
+            <h1>Gọi món</h1>
+        </div>
+        <button id="voice-button" class="voice-button" type="button" autofocus aria-describedby="voice-status">Bật gọi món bằng giọng nói</button>
+    </header>
+    <p id="voice-status" class="voice-status" role="status" aria-live="polite">Nhấn Enter, Space hoặc chạm hai ngón tay hai lần để gọi món.</p>
+    <div class="noise-meter" aria-label="Mức âm thanh môi trường">
+        <span id="noise-level-fill"></span>
+    </div>
+    <main class="order-layout">
+        <section class="menu-panel">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">THỰC ĐƠN</p>
+                    <h2>Món ăn</h2>
+                </div>
+                <span class="menu-count">8 món</span>
+            </div>
+            <div class="container menu">
+        <div id="pho_bo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlp-qO6K4A7V0oR6h5LQB8CWO6m1zcCIcTqZRRdr5Qgg&s" alt="Phở bò"><br>Phở bò<br><button id="pho_bo-btn" aria-label="Thêm một phở bò">+</button> 50.000 <button id="pho_bo-btn2" aria-label="Bớt một phở bò">-</button></div>
+        <div id="banh_mi"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7_l6dpnxc2BqpTRdn1ya8xgz_zq0I9zi9OlVBU1wnUg&s=10" alt="Bánh mì"><br>Bánh mì<br><button id="banh_mi-btn" aria-label="Thêm một bánh mì">+</button> 45.000 <button id="banh_mi-btn2" aria-label="Bớt một bánh mì">-</button></div>
+        <div id="bun_cha"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKWZqNBa1959CjqXNy-9Hl6VpTvhbld88ebbR6nVXFxQ&s=10" alt="Bún chả"><br>Bún chả<br><button id="bun_cha-btn" aria-label="Thêm một bún chả">+</button> 60.000 <button id="bun_cha-btn2" aria-label="Bớt một bún chả">-</button></div>
+        <div id="com_tam"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsxjQ47Osjztnx4022-Pynjz4gEOTGEXUGUXnfGrT6Rw&s=10" alt="Cơm tấm"><br>Cơm tấm<br><button id="com_tam-btn" aria-label="Thêm một cơm tấm">+</button> 60.000 <button id="com_tam-btn2" aria-label="Bớt một cơm tấm">-</button></div>
+        <div id="bun_bo">
+            <img src="  https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR26Fn2RAt6OIHQmYNj3HOH69Lipd8LuX3Uvz5JnyKrrw&s=10"
+            alt="Cơm tấm" width="175px" height="125px"><br>
+            Bún bò<br><button id = "bun_bo-btn" aria-label="Thêm một bún bò"> + </button>50.000
+            <button id = "bun_bo-btn2" aria-label="Bớt một bún bò"> - </button>
+        </div>
+        <div id="com_ga">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThIHpPTa-2oDrnLSK5XokOSkpfOaJzmwjRFQ8Ol5sWSQ&s=10"
+            alt=" Cơm gà" width="175px" height="125px"><br>
+            Cơm gà<br><button id = "com_ga-btn" aria-label="Thêm một cơm gà"> + </button>60.000    
+            <button id = "com_ga-btn2" aria-label="Bớt một cơm gà"> - </button>
+        </div>
+        <div id="tra_tac">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdvq2VJyFIZ4A0S9NBxgoj72olMcEBSTm4m46RqNW2jQ&s=10"
+            alt="Trà tắc" width="175px" height="125px"><br>
+            Trà tắc<br> <button id = "tra_tac-btn" aria-label="Thêm một trà tắc"> + </button> 20.000
+            <button id = "tra_tac-btn2" aria-label="Bớt một trà tắc"> - </button>
+        </div>
+        <div id="tra_da">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSydkB8eUi95gdqH1KgJmneJASi0XXi7ou3t0dR2Euc3Q&s=10"
+            alt="Trà đá"><br>
+            Trà đá<br> <button id="tra_da-btn" aria-label="Thêm một trà đá">+</button> 12.000
+            <button id="tra_da-btn2" aria-label="Bớt một trà đá">-</button>
+        </div>
+            </div> 
+        </section>
+        <aside class="cart-panel">
+            <div class="section-heading">
+                <div><p class="eyebrow">ĐƠN CỦA BẠN</p><h2>Giỏ hàng</h2></div>
+                <span class="cart-icon" aria-hidden="true">🛒</span>
+            </div>
+            <table id="gio"><tr><th>Món ăn</th><th>Giá</th></tr></table>
+            <div class="cart-total"><span>Tổng tiền</span><strong id="cart-total">0đ</strong></div>
+            <button class="submit-order-button" id="submit-order-button" type="button">Đặt món</button>
+        </aside>
+    </main>
+<script type="text/javascript" src="./index.AI"></script>
+<script src="./index.js"></script>
+</body>
+</html>
